@@ -1,0 +1,20 @@
+--- configure.ac.bak	2013-05-05 02:51:11.000000000 -0400
++++ configure.ac	2013-05-05 03:09:25.000000000 -0400
+@@ -19,7 +19,7 @@
+ # Interface number, revision and age of the library interface passed to
+ # libtool when the library is linked.
+ #
+-AC_SUBST(CF_VERSION_INFO, [476:19:0])
++AC_SUBST([CF_VERSION_INFO], [476:19:0])
+ 
+ #
+ # Check the sanity of thes source directory by checking for the
+@@ -579,7 +586,7 @@
+ # errors.
+ #
+ 
+-AC_ARG_WITH(warnings-as-errors,
++AC_ARG_WITH([warnings-as-errors],
+ 	AS_HELP_STRING([--with-warnings-as-errors=OPTION],
+ 		       [Compile the source code treating compiler warnings as errors.]),
+ 	[

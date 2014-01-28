@@ -4,7 +4,7 @@
 #
 # Declare autoconf version requirements
 #
-AC_PREREQ(2.61)
+AC_PREREQ([2.61])
 
 #
 # Initialize autoconf for the package
@@ -19,7 +19,7 @@ AC_INIT([CoreFoundation],[476.17.2],[bfulgham@users.sourceforge.net],[opencflite
 # Interface number, revision and age of the library interface passed to
 # libtool when the library is linked.
 #
-AC_SUBST(CF_VERSION_INFO, [476:17:2])
+AC_SUBST([CF_VERSION_INFO],[476:17:2])
 
 #
 # Check the sanity of thes source directory by checking for the
@@ -51,23 +51,10 @@ AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_LIBOBJ_DIR([compat])
 
 #
-# Initialize automake for the package, specifying the minimum automake
-# version allowed and that we are not an official GNU package, but
-# rather a non-GNU package leveraging automake.
-#
-AM_INIT_AUTOMAKE([1.9 foreign])
-
-#
-# Enable maintainer mode to prevent the package from constantly trying
-# to rebuild configure, Makefile.in, etc. Rebuilding such files rarely,
-# if ever, needs to be done "in the field".
-#
-AM_MAINTAINER_MODE
-
-#
 # Figure out what the canonical build, host and target tuples are.
+# Do this BEFORE initializing automake
 #
-AC_CANONICAL_HOST
+AC_CANONICAL_TARGET dnl# calls the other two
 
 AC_MSG_CHECKING([for supported deployment target])
 
@@ -98,7 +85,22 @@ case ${host_os} in
 		;;
 esac
 
-AC_MSG_RESULT(${deployment_target})
+AC_MSG_RESULT([${deployment_target}])
+
+#
+# Initialize automake for the package, specifying the minimum automake
+# version allowed and that we are not an official GNU package, but
+# rather a non-GNU package leveraging automake.
+# Also specify that some of our objects are built in subdirectories.
+#
+AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
+
+#
+# Enable maintainer mode to prevent the package from constantly trying
+# to rebuild configure, Makefile.in, etc. Rebuilding such files rarely,
+# if ever, needs to be done "in the field".
+#
+AM_MAINTAINER_MODE
 
 #
 # Checks for programs
@@ -106,24 +108,23 @@ AC_MSG_RESULT(${deployment_target})
 AC_PROG_CC
 AC_PROG_CXX
 CF_BSD_SOURCE
-AC_GNU_SOURCE
-AM_PROG_CC_C_O
+AC_USE_SYSTEM_EXTENSIONS
+AM_PROG_AR
 AC_PROG_CPP
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL
+LT_INIT([dlopen win32-dll])
 AC_PROG_LN_S
 AC_PROG_RANLIB
-AC_PATH_PROG(CMP, cmp)
-
-# Support building DLLs on Windows
-AC_LIBTOOL_WIN32_DLL
+AC_PATH_PROG([CMP],[cmp])
 
 #
 # Checks for language qualifiers and semantics
 #
+AC_C_BIGENDIAN
 AC_C_CHAR_UNSIGNED
 AC_C_CONST
 AC_C_INLINE
+AC_C_PROTOTYPES
 AC_C_RESTRICT
 AC_C_VOLATILE
 
@@ -134,20 +135,20 @@ AC_C_VOLATILE
 # If using GCC specify some additional parameters
 
 test_gcc_flag() {
-    AC_LANG_CONFTEST([int main() {}])
-    $CC -c conftest.c $CFLAGS $@ > /dev/null 2> /dev/null
+    AC_LANG_CONFTEST([AC_LANG_SOURCE([int main() {}])])
+    ${CC} -c conftest.c ${CFLAGS} $@ > /dev/null 2> /dev/null
     ret=$?
     rm -f conftest.o
-    return $ret
+    return ${ret}
 }
 
-if test "x$GCC" = "xyes" ; then
+if test "x${GCC}" = "xyes" ; then
     DESIRED_CFLAGS="-Wall -Wmost -pipe -Wno-trigraphs -Wno-parentheses -fexceptions -std=gnu99 -mmacosx-version-min=10.5 -fconstant-cfstrings"
 
-    for flag in $DESIRED_CFLAGS ; do
+    for flag in ${DESIRED_CFLAGS} ; do
         AC_MSG_CHECKING([whether ${CC} accepts ${flag}])
-        if test_gcc_flag $flag ; then
-           CFLAGS="$CFLAGS $flag"
+        if test_gcc_flag ${flag} ; then
+           CFLAGS="${CFLAGS} ${flag}"
            AC_MSG_RESULT([yes])
         else
            AC_MSG_RESULT([no])
@@ -173,7 +174,7 @@ AC_CACHE_CHECK([whether the target supports __sync_fetch_and_add],
 		])
 
 if test "x${cf_cv_have_sync_fetch_and_add}" != "xno"; then
-	AC_DEFINE(HAVE___SYNC_FETCH_AND_ADD, 1,
+	AC_DEFINE([HAVE___SYNC_FETCH_AND_ADD],[1],
 		  [Define this if your target compiler supports __sync_fetch_and_add])
 else
 	AC_MSG_ERROR([Support for __sync_fetch_and_add is required.])
@@ -193,7 +194,7 @@ AC_CACHE_CHECK([whether the target supports __sync_bool_compare_and_swap],
 		])
 
 if test "x${cf_cv_have_sync_bool_compare_and_swap}" != "xno"; then
-	AC_DEFINE(HAVE___SYNC_BOOL_COMPARE_AND_SWAP, 1,
+	AC_DEFINE([HAVE___SYNC_BOOL_COMPARE_AND_SWAP],[1],
 		  [Define this if your target compiler supports __sync_bool_compare_and_swap])
 else
 	AC_MSG_ERROR([Support for __sync_bool_compare_and_swap is required.])
@@ -212,7 +213,7 @@ AC_CACHE_CHECK([whether the target supports __sync_synchronize],
 		])
 
 if test "x${cf_cv_have_sync_synchronize}" != "xno"; then
-	AC_DEFINE(HAVE___SYNC_SYNCHRONIZE, 1,
+	AC_DEFINE([HAVE___SYNC_SYNCHRONIZE],[1],
 		  [Define this if your target compiler supports __sync_synchronize])
 else
 	AC_MSG_ERROR([Support for __sync_synchronize is required.])
@@ -226,33 +227,33 @@ fi
 AC_MSG_NOTICE([checking library build options])
 
 AC_MSG_CHECKING([whether to build a debug library instance])
-AC_ARG_ENABLE(debug,
-	AS_HELP_STRING([--disable-debug], [Disable the generation of a debug library instance @<:@default=no@:>@.]),
+AC_ARG_ENABLE([debug],
+	[AS_HELP_STRING([--disable-debug],[Disable the generation of a debug library instance @<:@default=no@:>@.])],
 	[build_debug=${enableval}],
 	[build_debug=yes])
 AC_MSG_RESULT(${build_debug})
-AM_CONDITIONAL([CF_BUILD_DEBUG], [test "x${build_debug}" = "xyes"])
+AM_CONDITIONAL([CF_BUILD_DEBUG],[test "x${build_debug}" = "xyes"])
 
 AC_MSG_CHECKING([whether to build a profile library instance])
-AC_ARG_ENABLE(profile,
-	AS_HELP_STRING([--disable-profile], [Disable the generation of a profile library instance @<:@default=no@:>@.]),
+AC_ARG_ENABLE([profile],
+	[AS_HELP_STRING([--disable-profile],[Disable the generation of a profile library instance @<:@default=no@:>@.])],
 	[build_profile=${enableval}],
 	[build_profile=yes])
 AC_MSG_RESULT(${build_profile})
-AM_CONDITIONAL([CF_BUILD_PROFILE], [test "x${build_profile}" = "xyes"])
+AM_CONDITIONAL([CF_BUILD_PROFILE],[test "x${build_profile}" = "xyes"])
 
 AC_MSG_CHECKING([whether to build tests and examples])
-AC_ARG_ENABLE(tests,
-	AS_HELP_STRING([--disable-tests],[Disable building of tests and examples @<:@default=no@:>@.]),
+AC_ARG_ENABLE([tests],
+	[AS_HELP_STRING([--disable-tests],[Disable building of tests and examples @<:@default=no@:>@.])],
 	[build_tests=${enableval}],
 	[build_tests=yes])
-AC_MSG_RESULT(${build_tests})
-AM_CONDITIONAL([CF_BUILD_TESTS], [test "x${build_tests}" = "xyes"])
+AC_MSG_RESULT([${build_tests}])
+AM_CONDITIONAL([CF_BUILD_TESTS],[test "x${build_tests}" = "xyes"])
 
 #
 # Checks for libraries
 #
-# We expect that we'll need at minimum:
+# We expect that we will need at minimum:
 #
 #   * dl
 #   * icui18n
@@ -265,9 +266,13 @@ AM_CONDITIONAL([CF_BUILD_TESTS], [test "x${build_tests}" = "xyes"])
 #   * rt
 #
 
+# FIXME: Replace `main' with a function in `-ldns_sd':
+AC_CHECK_LIB([dns_sd],[main])
+
 AC_MSG_NOTICE([checking required package dependencies])
 
-AC_PATH_PROG([PKG_CONFIG],[pkg-config])
+AC_PATH_PROG([PKG_CONFIG_PATH],[pkg-config])
+PKG_PROG_PKG_CONFIG
 
 #
 # Sort out where the ICU components are at.
@@ -277,7 +282,7 @@ AC_MSG_NOTICE([checking the International Components for Unicode (ICU) package])
 
 AC_PATH_PROG([ICU_CONFIG],[icu-config])
 
-AC_ARG_WITH(icu,
+AC_ARG_WITH([icu],
 	AS_HELP_STRING([--with-icu=DIR],
 		       [Specify location of the International Components for Unicode (ICU) headers and libraries.]),
 	[
@@ -288,12 +293,12 @@ AC_ARG_WITH(icu,
 		fi
 	],
 	[icu_dir=])
-AC_ARG_WITH(icu-includes,
+AC_ARG_WITH([icu-includes],
 	AS_HELP_STRING([--with-icu-includes=DIR],
 		       [Specify location of International Components for Unicode (ICU) headers.]),
 	[icu_header_dir=${withval}],
 	[icu_header_dir=])
-AC_ARG_WITH(icu-libs,
+AC_ARG_WITH([icu-libs],
 	AS_HELP_STRING([--with-icu-libs=DIR],
 		       [Specify location of International Components for Unicode (ICU) libraries.]),
 	[icu_library_dir=${withval}],
@@ -362,9 +367,9 @@ else
 	AC_MSG_ERROR([Cannot find the International Components for Unicode (ICU) package.])
 fi
 
-AC_SUBST(ICU_CPPFLAGS)
-AC_SUBST(ICU_LDFLAGS)
-AC_SUBST(ICU_LIBS)
+AC_SUBST([ICU_CPPFLAGS])
+AC_SUBST([ICU_LDFLAGS])
+AC_SUBST([ICU_LIBS])
 
 CPPFLAGS="${ICU_CPPFLAGS} ${CPPFLAGS}"
 LDFLAGS="${ICU_LDFLAGS} ${LDFLAGS}"
@@ -374,14 +379,19 @@ AC_CHECK_HEADERS([unicode/putil.h])
 AC_CHECK_HEADERS([unicode/ucal.h])
 AC_CHECK_HEADERS([unicode/ucol.h])
 AC_CHECK_HEADERS([unicode/ucurr.h])
-AC_CHECK_HEADERS([unicode/ucurr.h])
 AC_CHECK_HEADERS([unicode/udat.h])
 AC_CHECK_HEADERS([unicode/ulocdata.h])
-AC_CHECK_HEADERS([unicode/uloc.h])
 AC_CHECK_HEADERS([unicode/uloc.h])
 AC_CHECK_HEADERS([unicode/umsg.h])
 AC_CHECK_HEADERS([unicode/unum.h])
 AC_CHECK_HEADERS([unicode/uset.h])
+
+if test -d "${srcdir}/icu/unicode"; then
+  test -z "${ac_cv_header_unicode_ucurr_h}"
+  AC_CHECK_HEADERS_ONCE([unicode/ucurr.h])
+  test -z "${ac_cv_header_unicode_uloc_h}"
+  AC_CHECK_HEADERS_ONCE([unicode/uloc.h])
+fi
 
 #
 # Sort out where the UUID components are at.
@@ -391,7 +401,7 @@ AC_MSG_NOTICE([checking Universally Unique Identifier (UUID) package])
 
 AC_PATH_PROG([UUID_CONFIG],[uuid-config])
 
-AC_ARG_WITH(uuid,
+AC_ARG_WITH([uuid],
 	AS_HELP_STRING([--with-uuid=DIR],
 		       [Specify location of Universally Unique Identifier (UUID) headers and libraries.]),
 	[
@@ -401,12 +411,12 @@ AC_ARG_WITH(uuid,
 		uuid_dir=${withval}
 	],
 	[uuid_dir=])
-AC_ARG_WITH(uuid-includes,
+AC_ARG_WITH([uuid-includes],
 	AS_HELP_STRING([--with-uuid-includes=DIR],
 		       [Specify location of Universally Unique Identifier (UUID) headers.]),
 	[uuid_header_dir=${withval}],
 	[uuid_header_dir=])
-AC_ARG_WITH(uuid-libs,
+AC_ARG_WITH([uuid-libs],
 	AS_HELP_STRING([--with-uuid-libs=DIR],
 		       [Specify location of Universally Unique Identifier (UUID) libraries.]),
 	[uuid_library_dir=${withval}],
@@ -476,9 +486,9 @@ else
 	AC_MSG_ERROR([Cannot find the Universally Unique Identifier (UUID) package.])
 fi
 
-AC_SUBST(UUID_CPPFLAGS)
-AC_SUBST(UUID_LDFLAGS)
-AC_SUBST(UUID_LIBS)
+AC_SUBST([UUID_CPPFLAGS])
+AC_SUBST([UUID_LDFLAGS])
+AC_SUBST([UUID_LIBS])
 
 CPPFLAGS="${UUID_CPPFLAGS} ${CPPFLAGS}"
 LDFLAGS="${UUID_LDFLAGS} ${LDFLAGS}"
@@ -489,7 +499,7 @@ AC_CHECK_HEADERS([uuid/uuid.h])
 #
 # Check for POSIX thread support.
 #
-ACX_PTHREAD([],AC_MSG_ERROR([${PACKAGE_NAME} requires POSIX threads.]))
+AX_PTHREAD([],[AC_MSG_ERROR([${PACKAGE_NAME} requires POSIX threads.])])
 
 CFLAGS="${PTHREAD_CFLAGS} ${CFLAGS}"
 CPPFLAGS="${PTHREAD_CPPFLAGS} ${CPPFLAGS}"
@@ -500,19 +510,21 @@ LIBS="${PTHREAD_LIBS} ${LIBS}"
 # Check for where clock_gettime and friends are located.
 #
 
-AC_CHECK_LIB(rt, clock_gettime)
+AC_CHECK_LIB([rt],[clock_gettime])
 
 #
 # Check for DLFCN support.
 #
-AC_CHECK_LIB(dl, dlopen)
+# LT_INIT checks dlopen, so check for a different symbol here:
+AC_CHECK_LIB([dl],[dlsym])
 
-AC_CHECK_HEADERS([dlfcn.h])
+AC_CHECK_HEADERS_ONCE([dlfcn.h])
 
 #
 # Check for math support.
 #
-AC_CHECK_LIB(m, floor)
+LT_LIB_M
+AC_CHECK_LIB([m],[floor])
 
 AC_CHECK_HEADERS([math.h])
 
@@ -523,7 +535,7 @@ AC_CHECK_HEADERS([math.h])
 #
 
 AC_MSG_CHECKING([where to find the default local time zone data file])
-AC_ARG_WITH(tz-default,
+AC_ARG_WITH([tz-default],
 	AS_HELP_STRING([--with-tz-default=FILE],
 		       [Specify the location of the default local time zone data file on the target system @<:@default=/etc/localtime@:>@.]),
 	[tz_default_file=${withval}],
@@ -532,7 +544,7 @@ AC_MSG_RESULT(${tz_default_file})
 AC_DEFINE_UNQUOTED([TZDEFAULT],["${tz_default_file}"],[Define this to the location of the default local time zone data file (e.g. /etc/localtime) on the target system.])
 
 AC_MSG_CHECKING([where to find the time zone data files])
-AC_ARG_WITH(tz-data,
+AC_ARG_WITH([tz-data],
 	AS_HELP_STRING([--with-tz-data=DIR],
 		       [Specify the location of the time zone data files on the target system @<:@default=/usr/share/zoneinfo@:>@.]),
 	[tz_data_dir=${withval}],
@@ -545,10 +557,11 @@ AC_DEFINE_UNQUOTED([TZDIR],["${tz_data_dir}"],[Define this to the location of th
 #
 # Most systems based on the GNU C library do not have the header from
 # tzcode (see ftp://elsie.nci.nih.gov/pub/), "tzfile.h" installed which is
-# needed. Check if it exists. If it doesn't let the user point us at it.
+# needed. Check if it exists. If it does NOT exist, then let the user
+# point us at it.
 #
 
-AC_ARG_WITH(tz-includes,
+AC_ARG_WITH([tz-includes],
 	AS_HELP_STRING([--with-tz-includes=DIR],
 		       [Specify location of Time Zone (tzcode) headers @<:@default=/usr/include@:>@.]),
 	[
@@ -563,27 +576,33 @@ AC_ARG_WITH(tz-includes,
 
 CPPFLAGS="${TZ_CPPFLAGS} ${CPPFLAGS}"
 
-AC_CHECK_HEADER([tzfile.h],[true],AC_MSG_ERROR([${PACKAGE_NAME} requires 'tzfile.h'. Download the latest tzcode package from 'ftp://elsie.nci.nih.gov/pub/' and/or use the '--with-tz-includes=DIR' configuration option.]))
+AC_CHECK_HEADER([tzfile.h],[true],[AC_MSG_ERROR([${PACKAGE_NAME} requires 'tzfile.h'. Download the latest tzcode package from 'ftp://elsie.nci.nih.gov/pub/' and/or use the '--with-tz-includes=DIR' configuration option.])])
 
 #
 # Check for headers
 #
 
 AC_HEADER_DIRENT
-AC_HEADER_STDBOOL
-AC_HEADER_STDC
+AC_HEADER_STAT
+AC_HEADER_STDBOOL dnl# also "_CHECK"s it
 AC_HEADER_TIME
 
+AC_CHECK_HEADERS([ConditionalMacros.h])
+AC_CHECK_HEADERS([arpa/inet.h])
 AC_CHECK_HEADERS([alloca.h])
 AC_CHECK_HEADERS([arpa/nameser.h])
 AC_CHECK_HEADERS([assert.h])
 AC_CHECK_HEADERS([dns_sd.h])
 AC_CHECK_HEADERS([errno.h])
 AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([float.h])
+AC_CHECK_HEADERS([libintl.h])
 AC_CHECK_HEADERS([limits.h])
 AC_CHECK_HEADERS([locale.h])
+AC_CHECK_HEADERS([mach/mach.h])
 AC_CHECK_HEADERS([malloc.h])
 AC_CHECK_HEADERS([malloc/malloc.h])
+AC_CHECK_HEADERS([netdb.h])
 AC_CHECK_HEADERS([netinet/in.h])
 AC_CHECK_HEADERS([objc/objc.h])
 AC_CHECK_HEADERS([objc/runtime.h])
@@ -593,15 +612,15 @@ AC_CHECK_HEADERS([semaphore.h])
 AC_CHECK_HEADERS([setjmp.h])
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([stdarg.h])
-AC_CHECK_HEADERS([stdbool.h])
+AC_CHECK_HEADERS_ONCE([stdbool.h])
 AC_CHECK_HEADERS([stddef.h])
-AC_CHECK_HEADERS([stdint.h])
+AC_CHECK_HEADERS_ONCE([stdint.h])
 AC_CHECK_HEADERS([stdio.h])
-AC_CHECK_HEADERS([stdlib.h])
-AC_CHECK_HEADERS([string.h])
+AC_CHECK_HEADERS_ONCE([stdlib.h])
+AC_CHECK_HEADERS_ONCE([string.h])
 AC_CHECK_HEADERS([syslog.h])
 AC_CHECK_HEADERS([time.h])
-AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS_ONCE([unistd.h])
 AC_CHECK_HEADERS([xlocale.h])
 AC_CHECK_HEADERS([sys/cdefs.h])
 AC_CHECK_HEADERS([sys/errno.h])
@@ -609,11 +628,12 @@ AC_CHECK_HEADERS([sys/fcntl.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
 AC_CHECK_HEADERS([sys/mman.h])
 AC_CHECK_HEADERS([sys/param.h])
-AC_CHECK_HEADERS([sys/socket.h])
-AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_HEADERS_ONCE([sys/socket.h])
+AC_CHECK_HEADERS_ONCE([sys/stat.h])
 AC_CHECK_HEADERS([sys/time.h])
-AC_CHECK_HEADERS([sys/types.h])
+AC_CHECK_HEADERS_ONCE([sys/types.h])
 AC_CHECK_HEADERS([sys/uio.h])
+AC_CHECK_HEADERS([wchar.h])
 
 #
 # Checks for types and structures
@@ -641,13 +661,20 @@ AC_STRUCT_TIMEZONE
 AC_FUNC_ALLOCA
 AC_FUNC_CHOWN
 AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_ERROR_AT_LINE
 AC_FUNC_FORK
+AC_FUNC_LSTAT
+AC_FUNC_MALLOC
 AC_FUNC_MMAP
+AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
+AC_FUNC_STAT
+AC_FUNC_STRERROR_R
+AC_FUNC_STRTOD
 
 AC_CHECK_FUNCS([getcwd])
 AC_CHECK_FUNCS([gethostname])
-AC_CHECK_FUNCS([malloc realloc])
+AC_CHECK_FUNCS_ONCE([malloc realloc])
 AC_CHECK_FUNCS([memchr memcmp memmove memset])
 AC_CHECK_FUNCS([mkdir])
 AC_CHECK_FUNCS([munmap])
@@ -658,15 +685,20 @@ AC_CHECK_FUNCS([socket])
 AC_CHECK_FUNCS([getgid getuid getegid geteuid])
 AC_CHECK_FUNCS([getpid])
 AC_CHECK_FUNCS([strerror])
-AC_CHECK_FUNCS([rint strchr strdup strrchr strstr strtod strtol strtoul])
+AC_CHECK_FUNCS([rint strchr strdup strrchr strstr strtol strtoul])
+AC_CHECK_FUNCS_ONCE([strtod])
 AC_CHECK_FUNCS([strncmp strncasecmp])
 AC_CHECK_FUNCS([ustrncmp ustrncasecmp])
 AC_CHECK_FUNCS([symlink])
 AC_CHECK_FUNCS([readlink])
-AC_CHECK_FUNCS([lstat stat])
+AC_CHECK_FUNCS_ONCE([lstat stat])
 AC_CHECK_FUNCS([snprintf])
+AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_FUNCS([floor])
+AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([inet_ntoa])
 
-# Figure out how to map strlcat and strlcpy if they don't exist by
+# Figure out how to map strlcat and strlcpy if they do NOT exist by
 # either simply redefining them or by using a local compatibility
 # implementation.
 #
@@ -675,7 +707,7 @@ AC_CHECK_FUNCS([snprintf])
 # 
 #   1) ALWAYS NULL-terminate if the destination has length.
 #   2) Take the full size of the buffer (not the space left over).
-#   3) Don't NULL-fill the remainder of its destination.
+#   3) Do NOT NULL-fill the remainder of its destination.
 #   4) Return a size_t size rather than a char * pointer.
 #
 # While CoreFoundation has not been found to rely on any of these
@@ -685,7 +717,7 @@ CF_REPLACE_STRLN_FUNC([cat])
 CF_REPLACE_STRLN_FUNC([cpy])
 
 #
-# Other ibrary functions we might need to provide local compatibility
+# Other library functions we might need to provide local compatibility
 # implementations of.
 #
 AC_REPLACE_FUNCS([flsl gettimeofday])
