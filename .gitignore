@@ -10,6 +10,7 @@ compat/*deps/*.*o
 compat/Makefile
 conf*/*.awk
 confdefs.h
+conftest*
 examples/*/*deps/*.*o
 examples/*/*/*deps/*.*o
 examples/*/*/*/*deps/*.*o
@@ -27,3 +28,4 @@ CoreFoundation.pc
 *.lo
 *.la
 *.a
+*.tar.gz

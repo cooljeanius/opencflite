@@ -323,9 +323,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/SimpleWebServer/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnits examples/SimpleWebServer/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign examples/SimpleWebServer/Makefile
+	  $(AUTOMAKE) --gnits examples/SimpleWebServer/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

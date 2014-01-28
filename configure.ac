@@ -89,11 +89,11 @@ AC_MSG_RESULT([${deployment_target}])
 
 #
 # Initialize automake for the package, specifying the minimum automake
-# version allowed and that we are not an official GNU package, but
-# rather a non-GNU package leveraging automake.
+# version allowed. Also, even though we are not an official GNU package,
+# gnits strictness can still be useful to catch nitpicky things.
 # Also specify that some of our objects are built in subdirectories.
 #
-AM_INIT_AUTOMAKE([1.9 foreign subdir-objects])
+AM_INIT_AUTOMAKE([1.9 gnits subdir-objects])
 
 #
 # Enable maintainer mode to prevent the package from constantly trying
@@ -114,6 +114,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 LT_INIT([dlopen win32-dll])
 AC_PROG_LN_S
+AC_PROG_MKDIR_P
 AC_PROG_RANLIB
 AC_PATH_PROG([CMP],[cmp])
 

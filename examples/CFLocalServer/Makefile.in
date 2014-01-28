@@ -341,9 +341,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/CFLocalServer/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnits examples/CFLocalServer/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign examples/CFLocalServer/Makefile
+	  $(AUTOMAKE) --gnits examples/CFLocalServer/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
