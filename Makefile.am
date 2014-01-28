@@ -39,8 +39,8 @@ CF_COMMON_CPPFLAGS		= $(AM_CPPFLAGS)			\
 				  -DU_SHOW_DRAFT_API=1			\
 				  -DCF_BUILDING_CF=1			\
 				  -D__kCFCharacterSetDir=\"${libCoreFoundation_la_datadir}\" \
-				  -DMAC_OS_X_VERSION_OLD_MAX_ALLOWED=MAC_OS_X_VERSION_10_5 \
-				  -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_6 \
+				  -DMAC_OS_X_VERSION_MAX_ALLOWED=MAC_OS_X_VERSION_10_5 \
+				  -DMAC_OS_X_VERSION_NEW_MAX_ALLOWED=MAC_OS_X_VERSION_10_6 \
 				  -I$(top_srcdir)/include		\
 				  -I$(top_srcdir)/include/mach_support
 

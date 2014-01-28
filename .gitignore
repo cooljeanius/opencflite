@@ -11,6 +11,7 @@ compat/Makefile
 conf*/*.awk
 confdefs.h
 conftest*
+dist/*
 examples/*/*deps/*.*o
 examples/*/*/*deps/*.*o
 examples/*/*/*/*deps/*.*o
@@ -19,6 +20,10 @@ examples/*/Makefile
 include/Makefile
 include/config.h
 include/stamp-*
+macosx/build/*
+*.build
+*.pbxuser
+*.perspectivev3
 tests/*deps/*.*o
 tests/Makefile
 libtool
