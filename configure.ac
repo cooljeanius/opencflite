@@ -113,6 +113,7 @@ AM_PROG_AR
 AC_PROG_CPP
 AC_PROG_INSTALL
 LT_INIT([dlopen win32-dll])
+LT_LANG([C])
 AC_PROG_LN_S
 AC_PROG_MKDIR_P
 AC_PROG_RANLIB
@@ -284,8 +285,8 @@ AC_MSG_NOTICE([checking the International Components for Unicode (ICU) package])
 AC_PATH_PROG([ICU_CONFIG],[icu-config])
 
 AC_ARG_WITH([icu],
-	AS_HELP_STRING([--with-icu=DIR],
-		       [Specify location of the International Components for Unicode (ICU) headers and libraries.]),
+	[AS_HELP_STRING([--with-icu=DIR],
+		       [Specify location of the International Components for Unicode (ICU) headers and libraries.])],
 	[
 		if test "x${withval}" = "xno"; then
 			AC_MSG_ERROR([${PACKAGE_NAME} requires the International Components for Unicode (ICU) package])
@@ -295,13 +296,13 @@ AC_ARG_WITH([icu],
 	],
 	[icu_dir=])
 AC_ARG_WITH([icu-includes],
-	AS_HELP_STRING([--with-icu-includes=DIR],
-		       [Specify location of International Components for Unicode (ICU) headers.]),
+	[AS_HELP_STRING([--with-icu-includes=DIR],
+		       [Specify location of International Components for Unicode (ICU) headers.])],
 	[icu_header_dir=${withval}],
 	[icu_header_dir=])
 AC_ARG_WITH([icu-libs],
-	AS_HELP_STRING([--with-icu-libs=DIR],
-		       [Specify location of International Components for Unicode (ICU) libraries.]),
+	[AS_HELP_STRING([--with-icu-libs=DIR],
+		       [Specify location of International Components for Unicode (ICU) libraries.])],
 	[icu_library_dir=${withval}],
 	[icu_library_dir=])
 
@@ -403,8 +404,8 @@ AC_MSG_NOTICE([checking Universally Unique Identifier (UUID) package])
 AC_PATH_PROG([UUID_CONFIG],[uuid-config])
 
 AC_ARG_WITH([uuid],
-	AS_HELP_STRING([--with-uuid=DIR],
-		       [Specify location of Universally Unique Identifier (UUID) headers and libraries.]),
+	[AS_HELP_STRING([--with-uuid=DIR],
+		       [Specify location of Universally Unique Identifier (UUID) headers and libraries.])],
 	[
 		if test "x${withval}" = "xno"; then
 			AC_MSG_ERROR([${PACKAGE_NAME} requires the Universally Unique Identifier (UUID) package])
@@ -413,13 +414,13 @@ AC_ARG_WITH([uuid],
 	],
 	[uuid_dir=])
 AC_ARG_WITH([uuid-includes],
-	AS_HELP_STRING([--with-uuid-includes=DIR],
-		       [Specify location of Universally Unique Identifier (UUID) headers.]),
+	[AS_HELP_STRING([--with-uuid-includes=DIR],
+		       [Specify location of Universally Unique Identifier (UUID) headers.])],
 	[uuid_header_dir=${withval}],
 	[uuid_header_dir=])
 AC_ARG_WITH([uuid-libs],
-	AS_HELP_STRING([--with-uuid-libs=DIR],
-		       [Specify location of Universally Unique Identifier (UUID) libraries.]),
+	[AS_HELP_STRING([--with-uuid-libs=DIR],
+		       [Specify location of Universally Unique Identifier (UUID) libraries.])],
 	[uuid_library_dir=${withval}],
 	[uuid_library_dir=])
 
@@ -467,7 +468,7 @@ if test "x${uuid_dir}" != "x" -o "x${uuid_header_dir}" != "x" -o "x${uuid_librar
 	UUID_saved_libs="${LIBS}"
 	LIBS=""
 
-		AC_CHECK_LIB(uuid, uuid_compare)
+		AC_CHECK_LIB([uuid],[uuid_compare])
 
 	UUID_LIBS="${UUID_LDFLAGS} ${LIBS}"
 	LIBS="${UUID_saved_libs}"
@@ -537,17 +538,17 @@ AC_CHECK_HEADERS([math.h])
 
 AC_MSG_CHECKING([where to find the default local time zone data file])
 AC_ARG_WITH([tz-default],
-	AS_HELP_STRING([--with-tz-default=FILE],
-		       [Specify the location of the default local time zone data file on the target system @<:@default=/etc/localtime@:>@.]),
+	[AS_HELP_STRING([--with-tz-default=FILE],
+		       [Specify the location of the default local time zone data file on the target system @<:@default=/etc/localtime@:>@.])],
 	[tz_default_file=${withval}],
 	[tz_default_file="/etc/localtime"])
-AC_MSG_RESULT(${tz_default_file})
+AC_MSG_RESULT([${tz_default_file}])
 AC_DEFINE_UNQUOTED([TZDEFAULT],["${tz_default_file}"],[Define this to the location of the default local time zone data file (e.g. /etc/localtime) on the target system.])
 
 AC_MSG_CHECKING([where to find the time zone data files])
 AC_ARG_WITH([tz-data],
-	AS_HELP_STRING([--with-tz-data=DIR],
-		       [Specify the location of the time zone data files on the target system @<:@default=/usr/share/zoneinfo@:>@.]),
+	[AS_HELP_STRING([--with-tz-data=DIR],
+		       [Specify the location of the time zone data files on the target system @<:@default=/usr/share/zoneinfo@:>@.])],
 	[tz_data_dir=${withval}],
 	[tz_data_dir="/usr/share/zoneinfo"])
 AC_MSG_RESULT(${tz_data_dir})
@@ -563,8 +564,8 @@ AC_DEFINE_UNQUOTED([TZDIR],["${tz_data_dir}"],[Define this to the location of th
 #
 
 AC_ARG_WITH([tz-includes],
-	AS_HELP_STRING([--with-tz-includes=DIR],
-		       [Specify location of Time Zone (tzcode) headers @<:@default=/usr/include@:>@.]),
+	[AS_HELP_STRING([--with-tz-includes=DIR],
+		       [Specify location of Time Zone (tzcode) headers @<:@default=/usr/include@:>@.])],
 	[
 		if test "x${withval}" != "xyes"; then
 			if test -d "${withval}/include"; then
